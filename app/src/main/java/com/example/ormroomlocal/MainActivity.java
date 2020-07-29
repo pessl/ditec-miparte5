@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,10 +24,16 @@ public class MainActivity extends AppCompatActivity {
     private AdapterContacto mContactRecyclerAdapter;
     private List<Contacto> misdatos;
 
+    private ContactDAO mContactDAO;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mContactDAO = Room.databaseBuilder(this, AppDataBase.class, "db-contacts")
+                .allowMainThreadQueries() //Allows room to do operation on main thread
+                .build()
+                .getContactDAO();
         mAddContactFloatingActionButton = findViewById(R.id.addContactFloatingActionButton);
         mAddContactFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,19 +60,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_CREATE_CONTACT && resultCode == RESULT_OK) {
-            //loadContacts();
+            loadContacts();
         } else if (requestCode == RC_UPDATE_CONTACT && resultCode == RESULT_OK) {
-            // loadContacts();
+            loadContacts();
         }
     }
 
     private void loadContacts() {
-        misdatos = new ArrayList<>();
+        /*misdatos = new ArrayList<>();
         misdatos.add( new Contacto("JUAN", "Ticona", "952002434"));
         misdatos.add( new Contacto("WILSON", "Maquera", "954350345"));
         misdatos.add(new Contacto("ADRIAN", "Mamani", "943545453"));
         misdatos.add( new Contacto("CARLA", "Fuentes", "954543534"));
         misdatos.add(new Contacto("Delia", "Caceres", "969558585"));
-        mContactRecyclerAdapter.updateData(misdatos);
+        mContactRecyclerAdapter.updateData(misdatos);*/
+
+        mContactRecyclerAdapter.updateData(mContactDAO.getContacts());
     }
 }
